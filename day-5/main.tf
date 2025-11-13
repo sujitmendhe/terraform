@@ -94,7 +94,32 @@ resource "aws_instance" "name" {
 
 
 #create eip
+resource "aws_eip" "nat_eip" {
+  domain = "vpc"
+
+  tags = {
+    Name = "vpc-nat-eip"
+  }
+}
+
 #create nat
+resource "aws_nat_gateway" "name" {
+    allocation_id = aws_eip.nat_eip.id
+    subnet_id = aws_subnet.name.id
+  
+}
 #create route table edit route
+resource "aws_route_table" "name2" {
+  vpc_id = aws_vpc.name.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.name.id
+  }
+}
 #create subnet association
+resource "aws_route_table_association" "name2" {
+    subnet_id = aws_subnet.name-2.id
+    route_table_id = aws_route_table.name2.id
+  
+}
 #create private servers
